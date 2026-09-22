@@ -6,72 +6,126 @@
 
 <p align="center">
   A fast, modern code editor that just works.<br/>
-  No accounts. No sign-in. No nonsense.
+  No accounts. No sign-in. No unnecessary stuff.
 </p>
 
 ---
 
 ## Why Rune?
 
-Most editors want you to sign in with Microsoft, Google, or some other account before you can write a single line of code. **Rune doesn't.** Download it, open it, start coding. That's it.
+A lot of modern editors ask you to sign in with Microsoft, Google, or another account before you can even start coding.
+
+Rune keeps things simple.
+
+Download it, open it, and start writing code. No account, no sign-in, and no setup process getting in your way.
 
 ## Features
 
-- **No account required** — no Microsoft, no Google, no sign-in of any kind
-- **Blazing fast** — debounced syntax highlighting and optimized input pipeline for zero-lag typing
-- **Single `.exe`** — everything is embedded; UI assets extract to AppData on first run
-- **Built-in installer wizard** — custom setup with optional desktop and Start Menu shortcuts
-- **Syntax highlighting** — supports 39+ languages out of the box (C, C++, C#, Python, Rust, Go, TypeScript, JavaScript, HTML, CSS, JSON, YAML, Lua, Ruby, PHP, Swift, Kotlin, and many more)
-- **File explorer** — sidebar with folder tree, SVG language icons, context menus
-- **Tabs** — multiple files, drag-friendly tab bar, dirty indicators
-- **Find & replace** — quick in-file search with replace support
-- **Command palette** — `Ctrl+Shift+P` for quick access to all commands
-- **Quick open** — `Ctrl+P` to jump to any file instantly
-- **Themes** — Dark, Midnight, Dracula, Monokai, Light, High Contrast
-- **UI styles** — Modern and Classic layouts
-- **Accent colors** — customize the accent color to your liking
-- **Zen mode** — distraction-free editing with `F11`
-- **Context menus** — right-click everywhere: editor, tabs, file tree
-- **Custom titlebar** — native-feel window chrome with proper drag and resize
-- **Persistent settings** — theme, workspace, and preferences remembered across sessions
-- **Recent workspaces** — jump back into your last project
-- **Binary file detection** — clean error for `.zip`, `.exe`, images, and other binaries (minified/obfuscated code still opens fine)
-- **WebView2 powered** — modern Chromium rendering engine under the hood
+* **No account required**
+  No Microsoft account, Google account, or sign-in of any kind.
+
+* **Fast and responsive**
+  Debounced syntax highlighting and an optimized input pipeline keep typing smooth and responsive.
+
+* **Single `.exe`**
+  Everything is bundled into one executable. UI assets are extracted to AppData automatically when Rune first starts.
+
+* **Built-in installer**
+  A simple setup wizard lets you choose the install location and optionally create Desktop and Start Menu shortcuts.
+
+* **Syntax highlighting**
+  Supports 39+ languages out of the box, including C, C++, C#, Python, Rust, Go, TypeScript, JavaScript, HTML, CSS, JSON, YAML, Lua, Ruby, PHP, Swift, Kotlin, and more.
+
+* **File explorer**
+  Browse your projects with a sidebar folder tree, SVG language icons, and useful context menus.
+
+* **Tabs**
+  Work with multiple files at once with a simple tab bar and dirty file indicators.
+
+* **Find and replace**
+  Quickly search through the current file and replace text when needed.
+
+* **Command palette**
+  Press `Ctrl+Shift+P` to quickly find and run commands.
+
+* **Quick open**
+  Press `Ctrl+P` to quickly find and open files in your workspace.
+
+* **Themes**
+  Choose from Dark, Midnight, Dracula, Monokai, Light, and High Contrast.
+
+* **UI styles**
+  Switch between Modern and Classic layouts.
+
+* **Accent colors**
+  Pick an accent color that fits your setup.
+
+* **Zen mode**
+  Press `F11` for a distraction-free editing experience.
+
+* **Context menus**
+  Right-click files, tabs, and the editor to access relevant actions.
+
+* **Custom titlebar**
+  A custom window titlebar provides native-feeling controls, dragging, and resizing.
+
+* **Persistent settings**
+  Rune remembers your theme, workspace, and preferences between sessions.
+
+* **Recent workspaces**
+  Quickly get back to projects you've worked on recently.
+
+* **Binary file detection**
+  Rune detects files such as `.zip`, `.exe`, images, and other binary formats and shows a clean error instead of trying to open them. Minified and obfuscated source code still opens normally.
+
+* **WebView2 powered**
+  The interface is built on WebView2, giving Rune a modern Chromium-based rendering engine.
 
 ## Getting Started
 
-1. Download the latest `Rune.exe` from [Releases](https://github.com/JustSomeGuest/Rune/releases/latest)
-2. Run it — the setup wizard appears on first launch
-3. Choose your install folder, pick your shortcuts, hit **Install**
-4. Start coding — no account, no sign-in, no delays
+1. Download the latest `Rune.exe` from [Releases](https://github.com/JustSomeGuest/Rune/releases/latest).
+2. Run it. The setup wizard will appear the first time.
+3. Choose your install folder and decide whether you want Desktop or Start Menu shortcuts.
+4. Click **Install**.
+5. Open Rune and start coding.
+
+No account required.
 
 ## Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+N` | New file |
-| `Ctrl+O` | Open file |
-| `Ctrl+S` | Save |
-| `Ctrl+Shift+S` | Save as |
-| `Ctrl+P` | Quick open |
+| Shortcut       | Action          |
+| -------------- | --------------- |
+| `Ctrl+N`       | New file        |
+| `Ctrl+O`       | Open file       |
+| `Ctrl+S`       | Save            |
+| `Ctrl+Shift+S` | Save as         |
+| `Ctrl+P`       | Quick open      |
 | `Ctrl+Shift+P` | Command palette |
-| `Ctrl+F` | Find |
-| `Ctrl+H` | Replace |
-| `Ctrl+B` | Toggle sidebar |
-| `Ctrl+,` | Preferences |
-| `F11` | Zen mode |
+| `Ctrl+F`       | Find            |
+| `Ctrl+H`       | Replace         |
+| `Ctrl+B`       | Toggle sidebar  |
+| `Ctrl+,`       | Preferences     |
+| `F11`          | Zen mode        |
 
 ## Coming Soon
 
-- **GitHub integration** — clone, commit, push, and manage PRs directly from Rune. GitHub support is coming soon!
+### GitHub Integration
+
+GitHub support is in the works.
+
+The goal is to let you clone repositories, commit changes, push updates, and manage pull requests directly from Rune.
 
 ## Tech Stack
 
-- **.NET 8** + **WPF** — native Windows performance
-- **WebView2** — Chromium-based UI rendering
-- **Vanilla JS** — no frameworks, no bloat
+Rune is built with a small and straightforward stack:
+
+* **.NET 8** + **WPF** for the native Windows application
+* **WebView2** for the editor interface
+* **Vanilla JavaScript** for the UI, with no large frontend framework
 
 ## Building from Source
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/JustSomeGuest/Rune.git
@@ -79,15 +133,17 @@ cd Rune
 dotnet build
 ```
 
-To publish a single-file executable:
+To create a self-contained single-file executable:
 
 ```bash
 dotnet publish Rune.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 ```
 
+The resulting executable will be placed in the `publish` directory.
+
 ## License
 
-MIT
+Rune is released under the MIT License.
 
 ---
 
