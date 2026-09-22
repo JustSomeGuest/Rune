@@ -560,6 +560,12 @@ namespace Rune
                     return;
                 }
 
+                if (IsBinaryFile(fullPath))
+                {
+                    SendError($"Binary file '{Path.GetFileName(fullPath)}' cannot be opened as source code.", relativePath);
+                    return;
+                }
+
                 string content =
                     File.ReadAllText(fullPath);
 
@@ -715,6 +721,12 @@ namespace Rune
             {
                 try
                 {
+                    if (IsBinaryFile(file))
+                    {
+                        SendError($"Binary file '{Path.GetFileName(file)}' cannot be opened as source code.", file);
+                        continue;
+                    }
+
                     string content =
                         File.ReadAllText(file);
 
