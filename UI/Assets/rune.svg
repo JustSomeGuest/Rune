@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <path fill="#fff" fill-rule="evenodd" d="
+    M342 226
+    L343 796
+    L408 748
+    L408 628
+    L680 409
+    Z
+    M410 343
+    L556 424
+    L409 542
+    Z
+  "/>
+  <path fill="#fff" d="
+    M479 599
+    L681 765
+    L681 676
+    L533 556
+    Z
+  "/>
+</svg>
