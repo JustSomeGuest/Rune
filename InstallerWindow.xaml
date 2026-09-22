@@ -58,7 +58,14 @@
                 
                 <StackPanel Margin="0,0,0,16">
                     <TextBlock Text="Destination Folder:" FontSize="12" Foreground="#9CA3AF" Margin="0,0,0,6"/>
-                    <TextBox x:Name="PathTextBox" Text="C:\Program Files\Rune" Padding="8" Background="#161922" Foreground="#F0F2F5" BorderBrush="#2C3242" BorderThickness="1"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="PathTextBox" Text="C:\Program Files\Rune" Padding="8" Background="#161922" Foreground="#F0F2F5" BorderBrush="#2C3242" BorderThickness="1" VerticalContentAlignment="Center"/>
+                        <Button Grid.Column="1" Content="Browse..." Margin="8,0,0,0" Padding="12,6" Click="BrowseBtn_Click"/>
+                    </Grid>
                 </StackPanel>
 
                 <StackPanel>

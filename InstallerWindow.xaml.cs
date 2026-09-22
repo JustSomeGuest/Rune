@@ -1,7 +1,6 @@
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Security.Principal;
 using System.Windows;
 
 namespace Rune
@@ -13,6 +12,10 @@ namespace Rune
         public InstallerWindow()
         {
             InitializeComponent();
+            string defaultDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Programs", "Rune");
+            PathTextBox.Text = defaultDir;
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -20,48 +23,51 @@ namespace Rune
             Close();
         }
 
-        private async void NextBtn_Click(object sender, RoutedEventArgs e)
+        private void BrowseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFolderDialog
+            {
+                Title = "Select Installation Folder",
+                InitialDirectory = PathTextBox.Text
+            };
+            if (dialog.ShowDialog() == true)
+                PathTextBox.Text = dialog.FolderName;
+        }
+
+        private void NextBtn_Click(object sender, RoutedEventArgs e)
         {
             if (currentStep == 1)
             {
                 string targetDir = PathTextBox.Text.Trim();
                 if (string.IsNullOrEmpty(targetDir))
                 {
-                    MessageBox.Show("Please specify a valid installation path.", "Rune Setup", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please specify a valid installation path.", "Rune Setup",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                currentStep = 2;
-                Step1Panel.Visibility = Visibility.Collapsed;
-                Step2Panel.Visibility = Visibility.Visible;
-                CancelBtn.IsEnabled = false;
-                NextBtn.IsEnabled = false;
-
-                try
+                if (targetDir.StartsWith(@"C:\Program Files", StringComparison.OrdinalIgnoreCase))
                 {
-                    await System.Threading.Tasks.Task.Run(() => PerformInstallation(targetDir));
+                    MessageBoxResult result = MessageBox.Show(
+                        "Installing to Program Files requires administrator privileges. Restart as administrator?",
+                        "Rune Setup", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                    currentStep = 3;
-                    Step2Panel.Visibility = Visibility.Collapsed;
-                    Step3Panel.Visibility = Visibility.Visible;
-                    CancelBtn.Visibility = Visibility.Collapsed;
-                    NextBtn.Content = "Launch Rune";
-                    NextBtn.IsEnabled = true;
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        RestartElevated();
+                        return;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Installation failed:\n\n{ex.Message}", "Rune Setup", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Close();
-                }
+
+                BeginInstall(targetDir);
             }
             else if (currentStep == 3)
             {
-                // Launch installed application or close setup
                 string targetDir = PathTextBox.Text.Trim();
                 string exePath = Path.Combine(targetDir, "Rune.exe");
                 if (File.Exists(exePath))
                 {
-                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    Process.Start(new ProcessStartInfo
                     {
                         FileName = exePath,
                         UseShellExecute = true
@@ -71,92 +77,141 @@ namespace Rune
             }
         }
 
-        private void PerformInstallation(string targetDir)
+        private void RestartElevated()
         {
-            // Create directory
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = Environment.ProcessPath ?? "Rune.exe",
+                    Arguments = $"--setup \"{PathTextBox.Text.Trim()}\"",
+                    UseShellExecute = true,
+                    Verb = "runas"
+                });
+                Close();
+            }
+            catch
+            {
+                // User declined UAC
+            }
+        }
+
+        private async void BeginInstall(string targetDir)
+        {
+            currentStep = 2;
+            Step1Panel.Visibility = Visibility.Collapsed;
+            Step2Panel.Visibility = Visibility.Visible;
+            CancelBtn.IsEnabled = false;
+            NextBtn.IsEnabled = false;
+
+            bool createDesktop = DesktopShortcutCheck.IsChecked == true;
+            bool createStartMenu = StartMenuCheck.IsChecked == true;
+
+            try
+            {
+                await System.Threading.Tasks.Task.Run(() =>
+                    PerformInstallation(targetDir, createDesktop, createStartMenu));
+
+                currentStep = 3;
+                Step2Panel.Visibility = Visibility.Collapsed;
+                Step3Panel.Visibility = Visibility.Visible;
+                CancelBtn.Visibility = Visibility.Collapsed;
+                NextBtn.Content = "Launch Rune";
+                NextBtn.IsEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Installation failed:\n\n{ex.Message}", "Rune Setup",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+            }
+        }
+
+        private void PerformInstallation(string targetDir, bool createDesktop, bool createStartMenu)
+        {
             Directory.CreateDirectory(targetDir);
 
-            // Copy files from AppContext.BaseDirectory
             string sourceDir = AppContext.BaseDirectory;
-            foreach (string file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            string actualExe = Environment.ProcessPath ?? Path.Combine(sourceDir, "Rune.exe");
+
+            foreach (string file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
             {
                 string relativePath = Path.GetRelativePath(sourceDir, file);
-                // Skip installer itself if bundled
-                if (relativePath.Contains("installer", StringComparison.OrdinalIgnoreCase)) continue;
-
                 string destFile = Path.Combine(targetDir, relativePath);
                 string? destParent = Path.GetDirectoryName(destFile);
                 if (destParent != null) Directory.CreateDirectory(destParent);
-
                 File.Copy(file, destFile, true);
             }
 
-            // Create settings.json
+            string targetExe = Path.Combine(targetDir, "Rune.exe");
+            if (!string.Equals(
+                Path.GetFullPath(actualExe),
+                Path.GetFullPath(targetExe),
+                StringComparison.OrdinalIgnoreCase))
+            {
+                File.Copy(actualExe, targetExe, true);
+            }
+
             string settingsDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Rune");
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rune");
             Directory.CreateDirectory(settingsDir);
             string settingsPath = Path.Combine(settingsDir, "settings.json");
             if (!File.Exists(settingsPath))
             {
-                File.WriteAllText(settingsPath, "{\"lastWorkspace\":null,\"theme\":\"dark\",\"uiStyle\":\"modern\",\"accentColor\":\"#7c3aed\"}");
+                File.WriteAllText(settingsPath,
+                    "{\"lastWorkspace\":null,\"theme\":\"dark\",\"uiStyle\":\"modern\",\"accentColor\":\"#7c3aed\"}");
             }
-
-            string exePath = Path.Combine(targetDir, "Rune.exe");
-
-            // Desktop shortcut
-            bool createDesktop = false;
-            bool createStartMenu = false;
-            Dispatcher.Invoke(() =>
-            {
-                createDesktop = DesktopShortcutCheck.IsChecked == true;
-                createStartMenu = StartMenuCheck.IsChecked == true;
-            });
 
             if (createDesktop)
             {
-                string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string shortcutPath = Path.Combine(desktopPath, "Rune.lnk");
-                CreateShortcut(shortcutPath, exePath, "Rune Code Editor");
+                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                CreateShortcut(Path.Combine(desktop, "Rune.lnk"), targetExe, "Rune Code Editor");
             }
 
-            // Start Menu shortcut
             if (createStartMenu)
             {
-                string startMenuPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Programs),
-                    "Rune");
-                Directory.CreateDirectory(startMenuPath);
-                string shortcutPath = Path.Combine(startMenuPath, "Rune.lnk");
-                CreateShortcut(shortcutPath, exePath, "Rune Code Editor");
+                string programs = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+                string runeDir = Path.Combine(programs, "Rune");
+                Directory.CreateDirectory(runeDir);
+                CreateShortcut(Path.Combine(runeDir, "Rune.lnk"), targetExe, "Rune Code Editor");
+                CreateShortcut(Path.Combine(runeDir, "Uninstall.lnk"), targetExe, "Uninstall Rune",
+                    "--uninstall");
             }
         }
 
-        private static void CreateShortcut(string shortcutPath, string targetPath, string description)
+        private static void CreateShortcut(string shortcutPath, string targetPath,
+            string description, string arguments = "")
         {
             try
             {
                 Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
-                if (shellType != null)
-                {
-                    object? shell = Activator.CreateInstance(shellType);
-                    if (shell != null)
-                    {
-                        var shortcut = shellType.InvokeMember("CreateShortcut", System.Reflection.BindingFlags.InvokeMethod, null, shell, new object[] { shortcutPath });
-                        if (shortcut != null)
-                        {
-                            var shortcutType = shortcut.GetType();
-                            shortcutType.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { targetPath });
-                            shortcutType.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { description });
-                            shortcutType.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty, null, shortcut, new object[] { Path.GetDirectoryName(targetPath) ?? "" });
-                            shortcutType.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod, null, shortcut, null);
-                        }
-                    }
-                }
+                if (shellType == null) return;
+
+                object? shell = Activator.CreateInstance(shellType);
+                if (shell == null) return;
+
+                object? shortcut = shellType.InvokeMember("CreateShortcut",
+                    System.Reflection.BindingFlags.InvokeMethod, null, shell,
+                    new object[] { shortcutPath });
+
+                if (shortcut == null) return;
+
+                Type st = shortcut.GetType();
+                st.InvokeMember("TargetPath", System.Reflection.BindingFlags.SetProperty,
+                    null, shortcut, new object[] { targetPath });
+                st.InvokeMember("Description", System.Reflection.BindingFlags.SetProperty,
+                    null, shortcut, new object[] { description });
+                st.InvokeMember("WorkingDirectory", System.Reflection.BindingFlags.SetProperty,
+                    null, shortcut, new object[] { Path.GetDirectoryName(targetPath) ?? "" });
+                if (!string.IsNullOrEmpty(arguments))
+                    st.InvokeMember("Arguments", System.Reflection.BindingFlags.SetProperty,
+                        null, shortcut, new object[] { arguments });
+                st.InvokeMember("IconLocation", System.Reflection.BindingFlags.SetProperty,
+                    null, shortcut, new object[] { targetPath + ",0" });
+                st.InvokeMember("Save", System.Reflection.BindingFlags.InvokeMethod,
+                    null, shortcut, null);
             }
-            catch
-            {
-            }
+            catch { }
         }
     }
 }
