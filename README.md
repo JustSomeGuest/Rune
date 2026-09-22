@@ -130,7 +130,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-**In simple terms:** You can modify, use, and sell Rune or your own versions of it. Just keep the original license and credit **JustSomeGuest**, the original author.
+**In simple terms:** You can modify, use, and sell Rune or your own versions of it. Just keep the original license and credit **JustSomeGuest**, the original creator.
 
 ---
 
