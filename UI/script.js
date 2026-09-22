@@ -72,6 +72,19 @@ function request(type, data = {}) {
     });
 }
 
+const titlebarEl = document.getElementById("titlebar");
+if (titlebarEl) {
+    titlebarEl.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        if (e.target.closest("button, input, select, textarea, a, .dropdown-menu, .menu-button, .win-btn")) return;
+        try {
+            window.chrome.webview.hostObjects.sync.host.Drag();
+        } catch {
+            request("drag");
+        }
+    });
+}
+
 function showToast(message, type = "info") {
     if (!toastContainer) return;
 

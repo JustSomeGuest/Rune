@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
-        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <ApplicationIcon>Assets\rune.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,9 +14,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="UI\**\*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <Resource Include="Assets\rune.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="UI\index.html" LogicalName="rune.ui.index.html" />
+        <EmbeddedResource Include="UI\script.js" LogicalName="rune.ui.script.js" />
+        <EmbeddedResource Include="UI\style.css" LogicalName="rune.ui.style.css" />
+        <EmbeddedResource Include="UI\Assets\*.svg">
+            <LogicalName>rune.ui.assets.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
+        <EmbeddedResource Include="UI\Assets\logo\*">
+            <LogicalName>rune.ui.assets.logo.%(Filename)%(Extension)</LogicalName>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

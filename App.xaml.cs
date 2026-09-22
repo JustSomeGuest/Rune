@@ -11,6 +11,18 @@ namespace Rune
             base.OnStartup(e);
             DispatcherUnhandledException += OnDispatcherUnhandledException;
 
+            try
+            {
+                AssetManager.EnsureExtracted();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to extract UI assets:\n{ex.Message}",
+                    "Rune", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown(1);
+                return;
+            }
+
             if (e.Args.Length > 0 && e.Args[0].Equals("--setup", StringComparison.OrdinalIgnoreCase))
             {
                 string? presetPath = e.Args.Length > 1 ? e.Args[1] : null;
@@ -29,8 +41,22 @@ namespace Rune
             }
             else
             {
-                var mainWindow = new MainWindow();
-                mainWindow.Show();
+                string settingsPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Rune", "settings.json");
+
+                bool firstRun = !System.IO.File.Exists(settingsPath);
+
+                if (firstRun)
+                {
+                    var installer = new InstallerWindow();
+                    installer.Show();
+                }
+                else
+                {
+                    var mainWindow = new MainWindow();
+                    mainWindow.Show();
+                }
             }
         }
 

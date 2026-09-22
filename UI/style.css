@@ -233,7 +233,6 @@ button {
     padding: 0 12px;
     min-width: 0;
     flex: 1;
-    -webkit-app-region: drag;
 }
 
 .brand {
@@ -261,7 +260,6 @@ button {
     align-items: stretch;
     gap: 2px;
     margin-left: 10px;
-    -webkit-app-region: no-drag;
 }
 
 .menu-dropdown-container {
@@ -360,7 +358,6 @@ button {
     height: var(--titlebar-h);
     display: flex;
     align-items: stretch;
-    -webkit-app-region: no-drag;
 }
 
 .win-btn {

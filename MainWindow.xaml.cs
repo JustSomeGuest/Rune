@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -6,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
 using Microsoft.Web.WebView2.Core;
 
 namespace Rune
@@ -30,9 +32,26 @@ namespace Rune
 
         private const int DWMWA_BORDER_COLOR = 34;
         private const int WM_GETMINMAXINFO = 0x0024;
+        private const int WM_NCHITTEST = 0x0084;
         private const int WM_NCLBUTTONDOWN = 0x00A1;
+        private const int HTCLIENT = 0x0001;
         private const int HTCAPTION = 0x0002;
+        private const int HTLEFT = 10;
+        private const int HTRIGHT = 11;
+        private const int HTTOP = 12;
+        private const int HTTOPLEFT = 13;
+        private const int HTTOPRIGHT = 14;
+        private const int HTBOTTOM = 15;
+        private const int HTBOTTOMLEFT = 16;
+        private const int HTBOTTOMRIGHT = 17;
         private const int MONITOR_DEFAULTTONEAREST = 2;
+
+        private const double TitlebarHeight = 38.0;
+        private const double ResizeBorder = 6.0;
+
+        private double _menubarLeft = 140;
+        private double _menubarRight = 460;
+        private double _controlsWidth = 150;
 
         private string? workspacePath;
         private bool forceClose;
@@ -100,9 +119,21 @@ namespace Rune
             IntPtr wParam,
             IntPtr lParam);
 
+        [DllImport("user32.dll")]
+        private static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
         public MainWindow()
         {
             InitializeComponent();
+
+            string webViewData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Rune", "WebView2");
+            Directory.CreateDirectory(webViewData);
+            WebView.CreationProperties = new Microsoft.Web.WebView2.Wpf.CoreWebView2CreationProperties
+            {
+                UserDataFolder = webViewData
+            };
 
             settingsPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -142,7 +173,55 @@ namespace Rune
             IntPtr lParam,
             ref bool handled)
         {
-            if (msg == WM_GETMINMAXINFO)
+            if (msg == WM_NCHITTEST)
+            {
+                short screenX = (short)(lParam.ToInt32() & 0xFFFF);
+                short screenY = (short)((lParam.ToInt32() >> 16) & 0xFFFF);
+
+                var pt = new POINT { X = screenX, Y = screenY };
+                ScreenToClient(hwnd, ref pt);
+
+                var dpi = VisualTreeHelper.GetDpi(this);
+                double x = pt.X / dpi.DpiScaleX;
+                double y = pt.Y / dpi.DpiScaleY;
+                double w = ActualWidth;
+                double h = ActualHeight;
+
+                bool maximized = WindowState == WindowState.Maximized;
+                double border = maximized ? 0 : ResizeBorder;
+
+                if (border > 0)
+                {
+                    bool onLeft = x < border;
+                    bool onRight = x >= w - border;
+                    bool onTop = y < border;
+                    bool onBottom = y >= h - border;
+
+                    if (onTop && onLeft) { handled = true; return (IntPtr)HTTOPLEFT; }
+                    if (onTop && onRight) { handled = true; return (IntPtr)HTTOPRIGHT; }
+                    if (onBottom && onLeft) { handled = true; return (IntPtr)HTBOTTOMLEFT; }
+                    if (onBottom && onRight) { handled = true; return (IntPtr)HTBOTTOMRIGHT; }
+                    if (onLeft) { handled = true; return (IntPtr)HTLEFT; }
+                    if (onRight) { handled = true; return (IntPtr)HTRIGHT; }
+                    if (onTop) { handled = true; return (IntPtr)HTTOP; }
+                    if (onBottom) { handled = true; return (IntPtr)HTBOTTOM; }
+                }
+
+                if (y < TitlebarHeight)
+                {
+                    double controlsLeft = w - _controlsWidth;
+
+                    if (x >= controlsLeft)
+                        return IntPtr.Zero;
+
+                    if (x >= _menubarLeft && x <= _menubarRight)
+                        return IntPtr.Zero;
+
+                    handled = true;
+                    return (IntPtr)HTCAPTION;
+                }
+            }
+            else if (msg == WM_GETMINMAXINFO)
             {
                 WmGetMinMaxInfo(hwnd, lParam);
                 handled = true;
@@ -203,19 +282,69 @@ namespace Rune
 
         private async void InitializeWebView()
         {
-            await WebView.EnsureCoreWebView2Async();
+            string webViewData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Rune", "WebView2");
+            Directory.CreateDirectory(webViewData);
+
+            var env = await CoreWebView2Environment.CreateAsync(null, webViewData);
+            await WebView.EnsureCoreWebView2Async(env);
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = false;
 
             WebView.CoreWebView2.WebMessageReceived += WebMessageReceived;
 
-            string uiPath = Path.Combine(
-                AppContext.BaseDirectory,
-                "UI",
-                "index.html");
+            WebView.CoreWebView2.AddHostObjectToScript("host", new DragHost(this));
+
+            WebView.CoreWebView2.NavigationCompleted += async (_, args) =>
+            {
+                if (!args.IsSuccess) return;
+                try
+                {
+                    string script = @"(() => {
+                        const m = document.querySelector('.menubar');
+                        const w = document.querySelector('.window-controls');
+                        const mr = m ? m.getBoundingClientRect() : {left:140, right:460};
+                        const wr = w ? w.getBoundingClientRect() : {width:150};
+                        return [mr.left, mr.right, wr.width].join(',');
+                    })()";
+                    string? result = await WebView.CoreWebView2.ExecuteScriptAsync(script);
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        string cleaned = result.Trim('"');
+                        string[] parts = cleaned.Split(',');
+                        if (parts.Length == 3)
+                        {
+                            _menubarLeft = double.Parse(parts[0], CultureInfo.InvariantCulture);
+                            _menubarRight = double.Parse(parts[1], CultureInfo.InvariantCulture);
+                            _controlsWidth = double.Parse(parts[2], CultureInfo.InvariantCulture);
+                        }
+                    }
+                }
+                catch { }
+            };
+
+            string uiPath = AssetManager.IndexHtmlPath;
+
+            if (!File.Exists(uiPath))
+            {
+                MessageBox.Show(
+                    $"UI assets not found:\n{uiPath}\n\nThe installation may be incomplete.",
+                    "Rune", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
             WebView.CoreWebView2.Navigate(
                 new Uri(uiPath).AbsoluteUri);
+        }
+
+        [System.Runtime.InteropServices.ComVisible(true)]
+        [System.Runtime.InteropServices.ClassInterface(System.Runtime.InteropServices.ClassInterfaceType.AutoDual)]
+        public class DragHost
+        {
+            private readonly MainWindow _window;
+            public DragHost(MainWindow window) { _window = window; }
+            public void Drag() { _window.Dispatcher.Invoke(() => _window.BeginWindowDrag()); }
         }
 
         private void WebMessageReceived(
@@ -319,22 +448,22 @@ namespace Rune
 
         private void BeginWindowDrag()
         {
-            IntPtr hwnd =
-                new WindowInteropHelper(this).Handle;
-
             if (WindowState == WindowState.Maximized)
             {
                 WindowState = WindowState.Normal;
                 PostWindowState();
             }
 
-            ReleaseCapture();
-
-            SendMessage(
-                hwnd,
-                WM_NCLBUTTONDOWN,
-                new IntPtr(HTCAPTION),
-                IntPtr.Zero);
+            try
+            {
+                DragMove();
+            }
+            catch
+            {
+                IntPtr hwnd = new WindowInteropHelper(this).Handle;
+                ReleaseCapture();
+                SendMessage(hwnd, WM_NCLBUTTONDOWN, new IntPtr(HTCAPTION), IntPtr.Zero);
+            }
         }
 
         private void ToggleMaximize()

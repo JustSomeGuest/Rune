@@ -23,6 +23,18 @@ namespace Rune
             Close();
         }
 
+        private void CloseBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Titlebar_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+                return;
+            DragMove();
+        }
+
         private void BrowseBtn_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.OpenFolderDialog
@@ -109,8 +121,11 @@ namespace Rune
 
             try
             {
-                await System.Threading.Tasks.Task.Run(() =>
-                    PerformInstallation(targetDir, createDesktop, createStartMenu));
+                string report = await System.Threading.Tasks.Task.Run(() =>
+                {
+                    Dispatcher.Invoke(() => StatusText.Text = "Copying application files...");
+                    return PerformInstallation(targetDir, createDesktop, createStartMenu);
+                });
 
                 currentStep = 3;
                 Step2Panel.Visibility = Visibility.Collapsed;
@@ -118,6 +133,7 @@ namespace Rune
                 CancelBtn.Visibility = Visibility.Collapsed;
                 NextBtn.Content = "Launch Rune";
                 NextBtn.IsEnabled = true;
+                ReportText.Text = report;
             }
             catch (Exception ex)
             {
@@ -127,23 +143,13 @@ namespace Rune
             }
         }
 
-        private void PerformInstallation(string targetDir, bool createDesktop, bool createStartMenu)
+        private string PerformInstallation(string targetDir, bool createDesktop, bool createStartMenu)
         {
             Directory.CreateDirectory(targetDir);
 
-            string sourceDir = AppContext.BaseDirectory;
-            string actualExe = Environment.ProcessPath ?? Path.Combine(sourceDir, "Rune.exe");
-
-            foreach (string file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
-            {
-                string relativePath = Path.GetRelativePath(sourceDir, file);
-                string destFile = Path.Combine(targetDir, relativePath);
-                string? destParent = Path.GetDirectoryName(destFile);
-                if (destParent != null) Directory.CreateDirectory(destParent);
-                File.Copy(file, destFile, true);
-            }
-
+            string actualExe = Environment.ProcessPath ?? Path.Combine(AppContext.BaseDirectory, "Rune.exe");
             string targetExe = Path.Combine(targetDir, "Rune.exe");
+
             if (!string.Equals(
                 Path.GetFullPath(actualExe),
                 Path.GetFullPath(targetExe),
@@ -152,8 +158,9 @@ namespace Rune
                 File.Copy(actualExe, targetExe, true);
             }
 
-            string settingsDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Rune");
+            AssetManager.EnsureExtracted();
+
+            string settingsDir = AssetManager.AppDataDir;
             Directory.CreateDirectory(settingsDir);
             string settingsPath = Path.Combine(settingsDir, "settings.json");
             if (!File.Exists(settingsPath))
@@ -177,6 +184,34 @@ namespace Rune
                 CreateShortcut(Path.Combine(runeDir, "Uninstall.lnk"), targetExe, "Uninstall Rune",
                     "--uninstall");
             }
+
+            string[] requiredAssets =
+            {
+                AssetManager.IndexHtmlPath,
+                Path.Combine(AssetManager.UiDir, "script.js"),
+                Path.Combine(AssetManager.UiDir, "style.css"),
+                Path.Combine(AssetManager.AssetsDir, "rune.svg")
+            };
+
+            int verified = 0;
+            var missing = new System.Collections.Generic.List<string>();
+            foreach (string f in requiredAssets)
+            {
+                if (File.Exists(f))
+                    verified++;
+                else
+                    missing.Add(Path.GetFileName(f));
+            }
+
+            string report = $"Installed Rune.exe to {targetDir}\n";
+            report += $"Assets: {AssetManager.UiDir}\n";
+            report += $"Verified {verified}/{requiredAssets.Length} critical files";
+            if (missing.Count > 0)
+                report += $"\nMissing: {string.Join(", ", missing)}";
+            else
+                report += " - all OK";
+
+            return report;
         }
 
         private static void CreateShortcut(string shortcutPath, string targetPath,
