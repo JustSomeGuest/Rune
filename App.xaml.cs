@@ -1,24 +1,36 @@
 ﻿using System.Windows;
 using System.Windows.Threading;
 
-namespace Rune;
-
-public partial class App : Application
+namespace Rune
 {
-    protected override void OnStartup(StartupEventArgs e)
+    public partial class App : Application
     {
-        base.OnStartup(e);
-        DispatcherUnhandledException += OnDispatcherUnhandledException;
-    }
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        MessageBox.Show(
-            $"Rune hit an unexpected error and needs to recover:\n\n{e.Exception.Message}",
-            "Rune",
-            MessageBoxButton.OK,
-            MessageBoxImage.Warning);
+            if (e.Args.Length > 0 && e.Args[0].Equals("--setup", System.StringComparison.OrdinalIgnoreCase))
+            {
+                var installer = new InstallerWindow();
+                installer.Show();
+            }
+            else
+            {
+                var mainWindow = new MainWindow();
+                mainWindow.Show();
+            }
+        }
 
-        e.Handled = true;
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            MessageBox.Show(
+                $"Rune hit an unexpected error and needs to recover:\n\n{e.Exception.Message}",
+                "Rune",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            e.Handled = true;
+        }
     }
 }
