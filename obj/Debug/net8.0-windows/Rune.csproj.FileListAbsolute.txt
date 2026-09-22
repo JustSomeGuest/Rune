@@ -72,3 +72,5 @@ D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\refint\Rune.dll
 D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\Rune.pdb
 D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\Rune.genruntimeconfig.cache
 D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\ref\Rune.dll
+D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\InstallerWindow.baml
+D:\Apps\Utilities\Rune\obj\Debug\net8.0-windows\InstallerWindow.g.cs

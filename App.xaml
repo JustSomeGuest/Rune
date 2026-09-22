@@ -1,8 +1,7 @@
 ﻿<Application x:Class="Rune.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Rune"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:Rune">
     <Application.Resources>
          
     </Application.Resources>
