@@ -19,9 +19,7 @@
     --statusbar-h: 26px;
     --sidebar-w: 260px;
     --radius: 8px;
-    --shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
-    --shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.25);
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
 }
 
 body[data-theme="midnight"] {
@@ -112,59 +110,21 @@ body[data-theme="highcontrast"] {
 body[data-style="classic"] {
     --radius: 0px !important;
     --shadow: none !important;
-    --shadow-soft: none !important;
 }
 
-body[data-style="classic"],
-body[data-style="classic"] *,
-body[data-style="classic"] *::before,
-body[data-style="classic"] *::after {
-    border-radius: 0 !important;
-}
-
-body[data-style="classic"] *::-webkit-scrollbar,
-body[data-style="classic"] *::-webkit-scrollbar-track,
-body[data-style="classic"] *::-webkit-scrollbar-thumb,
-body[data-style="classic"] *::-webkit-scrollbar-corner {
-    border-radius: 0 !important;
-}
-
-body[data-style="classic"] * {
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    animation: none !important;
-    filter: none !important;
-    text-shadow: none !important;
-}
-
-body[data-style="classic"] .box-shadow-keep,
-body[data-style="classic"] .tree-row.active,
-body[data-style="classic"] .command-item.active,
-body[data-style="classic"] .command-item:hover,
-body[data-style="classic"] .quick-open-item.active,
-body[data-style="classic"] .quick-open-item:hover {
-    box-shadow: inset 2px 0 0 var(--accent) !important;
-}
-
-body[data-style="classic"] .titlebar,
-body[data-style="classic"] .sidebar,
-body[data-style="classic"] .statusbar,
-body[data-style="classic"] .find-bar,
+body[data-style="classic"] .brand-logo,
+body[data-style="classic"] .welcome-logo,
+body[data-style="classic"] .icon-btn,
 body[data-style="classic"] .dropdown-menu,
 body[data-style="classic"] .context-menu,
 body[data-style="classic"] .toast,
-body[data-style="classic"] .welcome {
-    background: var(--bg-1) !important;
-}
-
-body[data-style="classic"] .welcome {
-    background: var(--bg-0) !important;
-}
-
-body[data-style="classic"] .welcome-title {
-    -webkit-text-fill-color: var(--text) !important;
-    color: var(--text) !important;
+body[data-style="classic"] .modal-box,
+body[data-style="classic"] .empty-button,
+body[data-style="classic"] .find-bar input,
+body[data-style="classic"] .find-bar button,
+body[data-style="classic"] .welcome-actions button,
+body[data-style="classic"] .primary-btn {
+    border-radius: 0px !important;
 }
 
 /* Zen Mode */
@@ -180,8 +140,8 @@ body[data-zen="true"] .breadcrumbs {
 }
 
 body[data-style="modern"] ::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
 }
 body[data-style="modern"] ::-webkit-scrollbar-track {
     background: transparent;
@@ -189,16 +149,9 @@ body[data-style="modern"] ::-webkit-scrollbar-track {
 body[data-style="modern"] ::-webkit-scrollbar-thumb {
     background: var(--bg-active);
     border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: content-box;
 }
 body[data-style="modern"] ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-body[data-style="modern"] ::-webkit-scrollbar-corner {
-    background: transparent;
 }
 
 body[data-style="classic"] ::-webkit-scrollbar {
@@ -229,11 +182,9 @@ body {
     overflow: hidden;
     background: var(--bg-0);
     color: var(--text);
-    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: "Segoe UI", Inter, system-ui, sans-serif;
     font-size: 13px;
     user-select: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }
 
 button,
@@ -254,15 +205,6 @@ button {
     display: none !important;
 }
 
-:focus-visible {
-    outline: 1px solid var(--accent);
-    outline-offset: 1px;
-}
-
-::selection {
-    background: rgba(124, 58, 237, 0.35);
-}
-
 .app {
     width: 100%;
     height: 100%;
@@ -278,9 +220,7 @@ button {
     flex-shrink: 0;
     display: flex;
     align-items: stretch;
-    background: linear-gradient(180deg, rgba(30, 34, 46, 0.95), var(--bg-1));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--bg-1);
     border-bottom: 1px solid var(--border);
     position: relative;
     z-index: 50;
@@ -302,16 +242,16 @@ button {
     gap: 8px;
     color: var(--text);
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
 }
 
 .brand-logo {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
-    border-radius: 6px;
+    border-radius: var(--radius);
 }
 
 .menubar {
@@ -331,46 +271,38 @@ button {
 
 .menu-button {
     height: 28px;
-    padding: 0 11px;
+    padding: 0 10px;
     border: 0;
     outline: 0;
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
     font-size: 12px;
-    border-radius: 6px;
+    border-radius: var(--radius);
     margin: auto 0;
-    transition: background 0.15s var(--ease), color 0.15s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .menu-button:hover,
 .menu-button.active {
-    background: var(--accent-soft);
+    background: var(--bg-hover);
     color: var(--text);
 }
 
 .dropdown-menu {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 4px);
     left: 0;
-    min-width: 230px;
+    min-width: 220px;
     padding: 6px;
-    background: rgba(30, 34, 46, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: var(--bg-2);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
     z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    animation: dropdownIn 0.15s var(--ease);
-}
-
-@keyframes dropdownIn {
-    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .dropdown-menu button {
@@ -380,11 +312,11 @@ button {
     align-items: center;
     justify-content: space-between;
     padding: 0 10px;
-    border-radius: 6px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
     font-size: 12px;
     text-align: left;
-    transition: background 0.1s var(--ease), color 0.1s var(--ease);
+    transition: background 0.1s, color 0.1s;
 }
 
 .dropdown-menu button:hover {
@@ -440,11 +372,11 @@ button {
     background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: background 0.15s var(--ease), color 0.15s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .win-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-hover);
     color: var(--text);
 }
 
@@ -481,14 +413,14 @@ button {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(180deg, var(--bg-1), rgba(22, 25, 34, 0.98));
+    background: var(--bg-1);
     border-right: 1px solid var(--border);
-    transition: width 0.25s var(--ease);
+    transition: width 0.2s ease;
 }
 
 .sidebar-header {
-    height: 42px;
-    min-height: 42px;
+    height: 40px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -496,8 +428,7 @@ button {
     color: var(--text-muted);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    border-bottom: 1px solid var(--border-soft);
+    letter-spacing: 0.08em;
 }
 
 .sidebar-actions {
@@ -514,20 +445,16 @@ button {
     justify-content: center;
     padding: 0;
     border: 0;
-    border-radius: 6px;
+    border-radius: var(--radius);
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
-    transition: background 0.15s var(--ease), color 0.15s var(--ease), transform 0.1s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .icon-btn:hover {
-    background: var(--accent-soft);
+    background: var(--bg-hover);
     color: var(--text);
-}
-
-.icon-btn:active {
-    transform: scale(0.92);
 }
 
 .icon-btn svg {
@@ -556,15 +483,15 @@ button {
 }
 
 .empty-icon {
-    width: 52px;
-    height: 52px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
-    border-radius: 14px;
-    background: var(--accent-soft);
-    color: var(--accent);
+    margin-bottom: 14px;
+    border-radius: var(--radius);
+    background: var(--bg-3);
+    color: var(--text-muted);
 }
 
 .empty-icon svg {
@@ -593,27 +520,20 @@ button {
 }
 
 .empty-button {
-    padding: 8px 18px;
+    padding: 7px 14px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     background: var(--bg-3);
     color: var(--text-secondary);
     cursor: pointer;
     font-size: 12px;
-    font-weight: 600;
-    transition: all 0.2s var(--ease);
-    box-shadow: var(--shadow-soft);
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
 }
 
 .empty-button:hover {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-    transform: translateY(-1px);
-}
-
-.empty-button:active {
-    transform: translateY(0);
+    background: var(--bg-hover);
+    color: var(--text);
 }
 
 .tree {
@@ -621,8 +541,8 @@ button {
 }
 
 .tree-row {
-    width: calc(100% - 8px);
-    min-height: 28px;
+    width: 100%;
+    min-height: 27px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -634,9 +554,7 @@ button {
     text-align: left;
     cursor: pointer;
     font-size: 12px;
-    border-radius: 6px;
-    margin: 1px 4px;
-    transition: background 0.12s var(--ease), color 0.12s var(--ease);
+    transition: background 0.1s, color 0.1s;
 }
 
 .tree-row:hover {
@@ -648,7 +566,6 @@ button {
     background: var(--accent-soft);
     color: var(--text);
     font-weight: 500;
-    box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .tree-row.expanded {
@@ -713,8 +630,8 @@ button {
 }
 
 .tabs-bar {
-    height: 42px;
-    min-height: 42px;
+    height: 40px;
+    min-height: 40px;
     display: flex;
     align-items: stretch;
     background: var(--bg-1);
@@ -739,7 +656,7 @@ button {
 .tab {
     min-width: 130px;
     max-width: 230px;
-    height: 42px;
+    height: 40px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -748,13 +665,12 @@ button {
     color: var(--text-muted);
     cursor: pointer;
     background: var(--bg-1);
-    position: relative;
-    transition: background 0.15s var(--ease), color 0.15s var(--ease);
-    animation: tabIn 0.2s var(--ease);
+    transition: background 0.15s, color 0.15s;
+    animation: tabIn 0.2s ease-out;
 }
 
 @keyframes tabIn {
-    from { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -766,16 +682,7 @@ button {
 .tab.active {
     background: var(--bg-0);
     color: var(--text);
-}
-
-.tab.active::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    border-top: 2px solid var(--accent);
 }
 
 .tab-label {
@@ -795,19 +702,18 @@ button {
     justify-content: center;
     padding: 0;
     border: 0;
-    border-radius: 5px;
+    border-radius: var(--radius);
     background: transparent;
     color: var(--text-muted);
     cursor: pointer;
     font-size: 15px;
     line-height: 1;
-    transition: background 0.15s var(--ease), color 0.15s var(--ease), transform 0.1s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .tab-close:hover {
-    background: var(--danger);
-    color: white;
-    transform: scale(1.1);
+    background: var(--bg-hover);
+    color: var(--text);
 }
 
 .tab-close.dirty {
@@ -817,16 +723,16 @@ button {
 
 /* Breadcrumbs */
 .breadcrumbs {
-    height: 30px;
-    min-height: 30px;
+    height: 28px;
+    min-height: 28px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     padding: 0 16px;
     background: var(--bg-0);
     border-bottom: 1px solid var(--border-soft);
     color: var(--text-muted);
-    font-size: 11.5px;
+    font-size: 11px;
 }
 
 .crumb {
@@ -860,47 +766,35 @@ button {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px;
-    background: var(--bg-0);
+    padding: 30px;
 }
 
 .welcome-logo {
-    width: 76px;
-    height: 76px;
+    width: 72px;
+    height: 72px;
     object-fit: contain;
-    margin-bottom: 18px;
-    border-radius: 18px;
-    animation: logoFloat 5s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    margin-bottom: 16px;
+    border-radius: 16px;
 }
 
 .welcome-title {
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     color: var(--text);
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    background: linear-gradient(135deg, var(--text) 30%, var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 .welcome-subtitle {
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     color: var(--text-muted);
-    font-size: 13.5px;
-    letter-spacing: 0.01em;
+    font-size: 13px;
 }
 
 .welcome-sections {
     display: flex;
-    gap: 48px;
-    max-width: 640px;
+    gap: 40px;
+    max-width: 600px;
     width: 100%;
 }
 
@@ -912,42 +806,35 @@ button {
 }
 
 .welcome-col h3 {
-    margin: 0 0 8px 0;
-    color: var(--text-muted);
-    font-size: 11px;
+    margin: 0 0 6px 0;
+    color: var(--text-secondary);
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .welcome-col button {
-    height: 40px;
+    height: 36px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 0 16px;
+    gap: 8px;
+    padding: 0 14px;
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: var(--radius);
     background: var(--bg-1);
     color: var(--text-secondary);
     cursor: pointer;
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
-    transition: all 0.2s var(--ease);
+    transition: all 0.15s ease;
     text-align: left;
     width: 100%;
-    box-shadow: var(--shadow-soft);
 }
 
 .welcome-col button:hover {
     background: var(--bg-hover);
     color: var(--text);
     border-color: var(--accent);
-    transform: translateY(-2px);
-}
-
-.welcome-col button:active {
-    transform: translateY(0);
 }
 
 .welcome-col svg {
@@ -969,24 +856,23 @@ button {
 }
 
 .recent-item {
-    padding: 9px 14px;
+    padding: 8px 12px;
     background: var(--bg-1);
     border: 1px solid var(--border-soft);
-    border-radius: 8px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
     cursor: pointer;
     font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: all 0.18s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .recent-item:hover {
     background: var(--bg-hover);
     color: var(--text);
-    border-color: var(--accent);
-    transform: translateX(4px);
+    border-color: var(--border);
 }
 
 .recent-empty {
@@ -1010,28 +896,20 @@ button {
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: linear-gradient(180deg, var(--bg-1), rgba(22, 25, 34, 0.98));
-    backdrop-filter: blur(8px);
+    background: var(--bg-1);
     border-bottom: 1px solid var(--border);
     z-index: 10;
-    animation: findSlide 0.2s var(--ease);
-}
-
-@keyframes findSlide {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 .find-bar input {
-    height: 32px;
-    padding: 0 12px;
+    height: 30px;
+    padding: 0 10px;
     background: var(--bg-2);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     color: var(--text);
     font-size: 12px;
     outline: none;
-    transition: border-color 0.15s var(--ease);
 }
 
 .find-bar input:focus {
@@ -1039,21 +917,20 @@ button {
 }
 
 .find-bar button {
-    height: 32px;
+    height: 30px;
     padding: 0 12px;
     background: var(--bg-2);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
     font-size: 12px;
     cursor: pointer;
-    transition: all 0.15s var(--ease);
+    transition: background 0.15s, color 0.15s;
 }
 
 .find-bar button:hover {
     background: var(--bg-hover);
     color: var(--text);
-    border-color: var(--accent);
 }
 
 /* Unified ContentEditable Editor View (Zero Caret Offset) */
@@ -1069,7 +946,7 @@ button {
     min-width: 56px;
     background: var(--bg-0);
     border-right: 1px solid var(--border-soft);
-    padding: 18px 12px 18px 0;
+    padding: 18px 10px 18px 0;
     text-align: right;
     color: var(--text-muted);
     font-family: var(--font-family, "Cascadia Code", "JetBrains Mono", Consolas, monospace);
@@ -1078,7 +955,6 @@ button {
     user-select: none;
     overflow: hidden;
     white-space: pre;
-    opacity: 0.7;
 }
 
 .editor-view {
@@ -1111,12 +987,6 @@ button {
     background: rgba(124, 58, 237, 0.35);
 }
 
-body[data-theme="midnight"] #editorContent::selection { background: rgba(59, 130, 246, 0.35); }
-body[data-theme="dracula"] #editorContent::selection { background: rgba(255, 121, 198, 0.35); }
-body[data-theme="monokai"] #editorContent::selection { background: rgba(253, 151, 31, 0.35); }
-body[data-theme="light"] #editorContent::selection { background: rgba(99, 102, 241, 0.25); }
-body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255, 255, 0, 0.35); }
-
 /* Syntax Token Highlighting Colors */
 .token-keyword { color: #c678dd; font-weight: 600; }
 .token-string { color: #98c379; }
@@ -1132,19 +1002,18 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 14px;
-    background: linear-gradient(180deg, var(--bg-1), rgba(15, 17, 23, 0.98));
+    padding: 0 12px;
+    background: var(--bg-1);
     border-top: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 11px;
-    letter-spacing: 0.02em;
 }
 
 .status-left,
 .status-right {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
 .status-btn {
@@ -1158,14 +1027,6 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 }
 
 .status-btn:hover {
-    color: var(--accent);
-}
-
-.status-item {
-    transition: color 0.15s;
-}
-
-.status-right .status-item:hover {
     color: var(--text);
 }
 
@@ -1173,14 +1034,13 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.65);
     z-index: 3000;
     display: flex;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    animation: fadeIn 0.2s var(--ease);
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.15s ease-out;
 }
 
 @keyframes fadeIn {
@@ -1192,31 +1052,16 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
     width: 520px;
     background: var(--bg-2);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: modalIn 0.25s var(--ease);
-    position: relative;
-}
-
-.modal-box::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent 70%);
-    z-index: 1;
-    pointer-events: none;
+    animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .command-box {
-    width: 580px;
-    border-radius: 14px;
-    box-shadow: var(--shadow);
+    width: 560px;
 }
 
 .settings-box {
@@ -1278,16 +1123,14 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 }
 
 .settings-tab-btn {
-    height: 36px;
-    padding: 0 14px;
-    border-radius: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
-    font-size: 12.5px;
-    font-weight: 500;
+    font-size: 12px;
     text-align: left;
     cursor: pointer;
-    transition: all 0.15s var(--ease);
-    border: 1px solid transparent;
+    transition: background 0.15s, color 0.15s;
 }
 
 .settings-tab-btn:hover {
@@ -1299,7 +1142,6 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
     background: var(--accent-soft);
     color: var(--text);
     font-weight: 600;
-    border-color: var(--accent);
 }
 
 .settings-content {
@@ -1327,26 +1169,17 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 }
 
 .primary-btn {
-    padding: 9px 22px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    padding: 8px 18px;
+    background: var(--accent);
     color: white;
-    border-radius: 8px;
+    border-radius: var(--radius);
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s var(--ease);
-    border: 0;
-    letter-spacing: 0.01em;
-    box-shadow: var(--shadow-soft);
+    transition: background 0.15s;
 }
 
 .primary-btn:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.1);
-}
-
-.primary-btn:active {
-    transform: translateY(0);
-    filter: none;
+    background: var(--accent-hover);
 }
 
 .setting-item {
@@ -1368,10 +1201,10 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
     padding: 0 12px;
     background: var(--bg-3);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius);
     color: var(--text);
     outline: none;
-    transition: border-color 0.15s var(--ease);
+    transition: border-color 0.15s;
 }
 
 .setting-item select:focus,
@@ -1400,20 +1233,14 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 #commandInput,
 #quickOpenInput {
     width: 100%;
-    height: 48px;
-    padding: 0 20px;
+    height: 44px;
+    padding: 0 18px;
     background: var(--bg-1);
     border: 0;
     border-bottom: 1px solid var(--border);
     color: var(--text);
-    font-size: 14.5px;
+    font-size: 14px;
     outline: none;
-    letter-spacing: 0.01em;
-}
-
-#commandInput::placeholder,
-#quickOpenInput::placeholder {
-    color: var(--text-muted);
 }
 
 .command-results,
@@ -1426,16 +1253,16 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 .command-item,
 .quick-open-item {
     width: 100%;
-    height: 38px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 14px;
-    border-radius: 8px;
+    padding: 0 12px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
     cursor: pointer;
     text-align: left;
-    transition: background 0.1s var(--ease), color 0.1s var(--ease), transform 0.08s var(--ease);
+    transition: background 0.1s, color 0.1s;
 }
 
 .command-item:hover,
@@ -1444,7 +1271,6 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 .quick-open-item.active {
     background: var(--accent-soft);
     color: var(--text);
-    box-shadow: inset 2px 0 0 var(--accent);
 }
 
 .command-shortcut {
@@ -1467,18 +1293,15 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 .context-menu {
     position: fixed;
     z-index: 1000;
-    min-width: 210px;
+    min-width: 200px;
     padding: 6px;
     border: 1px solid var(--border);
-    border-radius: 10px;
-    background: rgba(30, 34, 46, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius);
+    background: var(--bg-2);
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     gap: 2px;
-    animation: dropdownIn 0.12s var(--ease);
 }
 
 .context-menu button {
@@ -1487,11 +1310,11 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
     display: flex;
     align-items: center;
     padding: 0 10px;
-    border-radius: 6px;
+    border-radius: var(--radius);
     color: var(--text-secondary);
     font-size: 12px;
     text-align: left;
-    transition: background 0.1s var(--ease), color 0.1s var(--ease);
+    transition: background 0.1s, color 0.1s;
 }
 
 .context-menu button:hover {
@@ -1518,19 +1341,17 @@ body[data-theme="highcontrast"] #editorContent::selection { background: rgba(255
 }
 
 .toast {
-    padding: 13px 18px;
-    background: rgba(30, 34, 46, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    padding: 12px 18px;
+    background: var(--bg-2);
     border: 1px solid var(--border);
     border-left: 4px solid var(--accent);
-    border-radius: 10px;
+    border-radius: var(--radius);
     color: var(--text);
-    font-size: 12.5px;
+    font-size: 12px;
     box-shadow: var(--shadow);
     pointer-events: auto;
-    animation: toastIn 0.25s var(--ease);
-    max-width: 360px;
+    animation: toastIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    max-width: 340px;
     word-break: break-word;
 }
 

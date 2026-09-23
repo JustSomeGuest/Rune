@@ -169,8 +169,6 @@ namespace Rune
                     "{\"lastWorkspace\":null,\"theme\":\"dark\",\"uiStyle\":\"modern\",\"accentColor\":\"#7c3aed\"}");
             }
 
-            AssetManager.MarkInstalled();
-
             if (createDesktop)
             {
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

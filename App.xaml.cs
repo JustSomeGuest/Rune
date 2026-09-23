@@ -23,12 +23,6 @@ namespace Rune
                 return;
             }
 
-            _ = System.Threading.Tasks.Task.Run(async () =>
-            {
-                try { await AssetManager.DownloadMissingAssetsAsync(); }
-                catch { }
-            });
-
             if (e.Args.Length > 0 && e.Args[0].Equals("--setup", StringComparison.OrdinalIgnoreCase))
             {
                 string? presetPath = e.Args.Length > 1 ? e.Args[1] : null;
@@ -45,15 +39,24 @@ namespace Rune
                 if (result == MessageBoxResult.Yes)
                     Uninstall();
             }
-            else if (!AssetManager.IsInstalled)
-            {
-                var installer = new InstallerWindow();
-                installer.Show();
-            }
             else
             {
-                var mainWindow = new MainWindow();
-                mainWindow.Show();
+                string settingsPath = System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "Rune", "settings.json");
+
+                bool firstRun = !System.IO.File.Exists(settingsPath);
+
+                if (firstRun)
+                {
+                    var installer = new InstallerWindow();
+                    installer.Show();
+                }
+                else
+                {
+                    var mainWindow = new MainWindow();
+                    mainWindow.Show();
+                }
             }
         }
 
@@ -67,10 +70,6 @@ namespace Rune
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 string lnk = System.IO.Path.Combine(desktop, "Rune.lnk");
                 if (System.IO.File.Exists(lnk)) System.IO.File.Delete(lnk);
-
-                string settingsDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Rune";
-                if (System.IO.Directory.Exists(settingsDir))
-                    System.IO.Directory.Delete(settingsDir, true);
 
                 string programs = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
                 string runeDir = System.IO.Path.Combine(programs, "Rune");

@@ -31,11 +31,6 @@ namespace Rune
         };
 
         private const int DWMWA_BORDER_COLOR = 34;
-        private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
-        private const int GWL_STYLE = -16;
-        private const int WS_CAPTION = 0x00C00000;
-        private const int WS_SYSMENU = 0x00080000;
-        private const int WS_THICKFRAME = 0x00040000;
         private const int WM_GETMINMAXINFO = 0x0024;
         private const int WM_NCHITTEST = 0x0084;
         private const int WM_NCLBUTTONDOWN = 0x00A1;
@@ -127,12 +122,6 @@ namespace Rune
         [DllImport("user32.dll")]
         private static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
-        [DllImport("user32.dll")]
-        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-        [DllImport("user32.dll")]
-        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-
         public MainWindow()
         {
             InitializeComponent();
@@ -171,18 +160,6 @@ namespace Rune
                 DWMWA_BORDER_COLOR,
                 ref color,
                 sizeof(int));
-
-            int dark = 1;
-            DwmSetWindowAttribute(
-                hwnd,
-                DWMWA_USE_IMMERSIVE_DARK_MODE,
-                ref dark,
-                sizeof(int));
-
-            int style = GetWindowLong(hwnd, GWL_STYLE);
-            style &= ~(WS_CAPTION | WS_SYSMENU);
-            style |= WS_THICKFRAME;
-            SetWindowLong(hwnd, GWL_STYLE, style);
 
             HwndSource? source = HwndSource.FromHwnd(hwnd);
 
@@ -310,20 +287,10 @@ namespace Rune
                 "Rune", "WebView2");
             Directory.CreateDirectory(webViewData);
 
-            Environment.SetEnvironmentVariable(
-                "WEBVIEW2_DEFAULT_BACKGROUND_COLOR",
-                "00000000");
-
-            WebView.DefaultBackgroundColor = System.Drawing.Color.FromArgb(0, 0x0B, 0x0C, 0x0F);
-
             var env = await CoreWebView2Environment.CreateAsync(null, webViewData);
             await WebView.EnsureCoreWebView2Async(env);
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = false;
-            WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-            WebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
-            WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-            WebView.CoreWebView2.Settings.IsZoomControlEnabled = false;
 
             WebView.CoreWebView2.WebMessageReceived += WebMessageReceived;
 
