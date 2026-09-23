@@ -97,10 +97,13 @@ dotnet build
 To create a self-contained single-file executable:
 
 ```bash
-dotnet publish Rune.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+dotnet publish Rune.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
 ```
 
 The resulting executable will be placed in the `publish` directory.
+Ship the whole `publish` folder (or at least `Rune.exe`) — older releases
+that uploaded only `Rune.exe` without bundled native libraries crashed
+silently on launch.
 
 ## License
 

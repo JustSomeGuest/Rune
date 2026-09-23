@@ -282,13 +282,30 @@ namespace Rune
 
         private async void InitializeWebView()
         {
-            string webViewData = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rune", "WebView2");
-            Directory.CreateDirectory(webViewData);
+            try
+            {
+                string webViewData = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Rune", "WebView2");
+                Directory.CreateDirectory(webViewData);
 
-            var env = await CoreWebView2Environment.CreateAsync(null, webViewData);
-            await WebView.EnsureCoreWebView2Async(env);
+                var env = await CoreWebView2Environment.CreateAsync(null, webViewData);
+                await WebView.EnsureCoreWebView2Async(env);
+            }
+            catch (Exception ex)
+            {
+                App.LogCrash("WebView2Init", ex);
+                MessageBox.Show(
+                    $"Could not start the WebView2 engine:\n{ex.Message}\n\n" +
+                    "Rune needs the WebView2 Runtime (it ships with Windows 10/11 and Edge).\n" +
+                    "Download it from https://developer.microsoft.com/microsoft-edge/webview2/\n\n" +
+                    "Details saved to %TEMP%\\Rune_crash.log",
+                    "Rune", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            try
+            {
 
             WebView.CoreWebView2.Settings.IsNonClientRegionSupportEnabled = false;
 
@@ -336,6 +353,14 @@ namespace Rune
 
             WebView.CoreWebView2.Navigate(
                 new Uri(uiPath).AbsoluteUri);
+            }
+            catch (Exception ex)
+            {
+                App.LogCrash("WebView2Navigate", ex);
+                MessageBox.Show(
+                    $"Could not load the Rune interface:\n{ex.Message}\n\nDetails saved to %TEMP%\\Rune_crash.log",
+                    "Rune", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         [System.Runtime.InteropServices.ComVisible(true)]
